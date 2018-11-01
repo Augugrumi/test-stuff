@@ -8,8 +8,8 @@ class UDPClient {
    public static void main(String args[]) throws Exception {
       BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
       DatagramSocket clientSocket = new DatagramSocket();
-      InetAddress IPAddress = InetAddress.getByName("localhost");
-      int port = Integer.parseInt(args[0]);
+      InetAddress IPAddress = InetAddress.getByName(args[0]);
+      int port = Integer.parseInt(args[1]);
 
       /*read udp header from file*/
       /*Path fileLocation = Paths.get("udpheaderclient.txt");
