@@ -29,11 +29,22 @@ def parse_args():
     parser.add_option('--dst-port',
                       help='Destination host port, eg. 623.',
                       type=int)
+    parser.add_option('--recv-ip',
+                      help='Receiver ip, eg 192.168.4.54')
+    parser.add_option('--recv-port',
+                      help='Receiver port, eg. 623',
+                      type=int)
 
     return parser.parse_args()
 
 (options, args) = parse_args()
 
+def get_my_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    res = s.getsockname()[0]
+    s.close()
+    return res
 
 def recv():
     sock_src = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,14 +59,15 @@ def recv():
     sock_src.listen(5)
     while True:
         (clientsocket, address) = sock_src.accept()
+        my_ip = get_my_ip()
         while True:
             data = clientsocket.recv(65535)
             if not data:
                 logger.error('error while receiving data')
                 break
             logger.debug('received data')
-            pkt = IP(src=options.bind_address, dst=options.dst_ip) / \
-                TCP(sport=options.port, dport=options.dst_port)
+            pkt = IP(src=my_ip, dst=options.recv_ip) / \
+                TCP(sport=options.port, dport=options.recv_port)
             data = raw(pkt) + data
             sock_dst.send(data)
             data = sock_dst.recv(65535)
