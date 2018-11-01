@@ -47,12 +47,18 @@ def get_my_ip():
     s.close()
     return res
 
-def handle_single_connection(clientsocket, sock_dst):
+def handle_single_connection(clientsocket):
+    sock_dst = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    dst_addr = (options.dst_ip, options.dst_port)
     my_ip = get_my_ip()
+
+    sock_dst.connect(dst_addr)
     while True:
         data = clientsocket.recv(65535)
         if not data:
             logger.error('error while receiving data')
+            sock_dst.shutdown(socket.SHUT_RDWR)
+            sock_dst.close()
             break
         logger.debug('received data')
         pkt = IP(src=my_ip, dst=options.recv_ip) / \
@@ -64,11 +70,7 @@ def handle_single_connection(clientsocket, sock_dst):
 
 def recv():
     sock_src = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_dst = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     recv_addr = (options.bind_address, options.port)
-    dst_addr = (options.dst_ip, options.dst_port)
-
-    sock_dst.connect(dst_addr)
 
     # Waiting for incoming TCP connection
     sock_src.bind(recv_addr)
@@ -77,12 +79,11 @@ def recv():
         logger.debug('waiting for an incoming connection...')
         (clientsocket, address) = sock_src.accept()
         logger.debug('incoming connection accepted')
-        handle_single_connection(clientsocket, sock_dst)
+        handle_single_connection(clientsocket)
         clientsocket.close()
         logger.debug('current connection closed')
 
     sock_src.close()
-    sock_dst.close()
 
 if __name__ == '__main__':
     parse_args()
