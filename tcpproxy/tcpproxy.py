@@ -29,42 +29,61 @@ def parse_args():
     parser.add_option('--dst-port',
                       help='Destination host port, eg. 623.',
                       type=int)
+    parser.add_option('--recv-ip',
+                      help='Receiver ip, eg 192.168.4.54')
+    parser.add_option('--recv-port',
+                      help='Receiver port, eg. 623',
+                      type=int)
 
     return parser.parse_args()
 
 (options, args) = parse_args()
 
+def get_my_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    res = s.getsockname()[0]
+
+    s.close()
+    return res
+
+def handle_single_connection(clientsocket):
+    sock_dst = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    dst_addr = (options.dst_ip, options.dst_port)
+    my_ip = get_my_ip()
+
+    sock_dst.connect(dst_addr)
+    while True:
+        data = clientsocket.recv(65535)
+        if not data:
+            logger.error('error while receiving data')
+            sock_dst.shutdown(socket.SHUT_RDWR)
+            sock_dst.close()
+            break
+        logger.debug('received data')
+        pkt = IP(src=my_ip, dst=options.recv_ip) / \
+            TCP(sport=options.port, dport=options.recv_port)
+        data = raw(pkt) + data
+        sock_dst.send(data)
+        data = sock_dst.recv(65535)
+        clientsocket.send(data)
 
 def recv():
     sock_src = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_dst = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     recv_addr = (options.bind_address, options.port)
-    dst_addr = (options.dst_ip, options.dst_port)
-
-    sock_dst.connect(dst_addr)
 
     # Waiting for incoming TCP connection
     sock_src.bind(recv_addr)
     sock_src.listen(5)
     while True:
+        logger.debug('waiting for an incoming connection...')
         (clientsocket, address) = sock_src.accept()
-        while True:
-            data = clientsocket.recv(65535)
-            if not data:
-                logger.error('error while receiving data')
-                break
-            logger.debug('received data')
-            pkt = IP(src=options.bind_address, dst=options.dst_ip) / \
-                TCP(sport=options.port, dport=options.dst_port)
-            data = raw(pkt) + data
-            sock_dst.send(data)
-            data = sock_dst.recv(65535)
-            clientsocket.send(data)
-
+        logger.debug('incoming connection accepted')
+        handle_single_connection(clientsocket)
         clientsocket.close()
+        logger.debug('current connection closed')
 
     sock_src.close()
-    sock_dst.close()
 
 if __name__ == '__main__':
     parse_args()
