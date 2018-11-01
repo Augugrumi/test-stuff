@@ -24,20 +24,22 @@ class UDPServer {
 
 
          /*read udp header from file*/
-         Path fileLocation = Paths.get("udpheaderserver.txt");
+         /*Path fileLocation = Paths.get("udpheaderserver.txt");
          byte[] data = Files.readAllBytes(fileLocation);
          /***************************/
-         byte[] c = new byte[data.length + sentence.getBytes().length];
+         /*byte[] c = new byte[data.length + sentence.getBytes().length];
          System.arraycopy(data, 0, c, 0, data.length);
-         System.arraycopy(sentence.trim().getBytes(), 0, c, data.length, sentence.trim().getBytes().length);
+         System.arraycopy(sentence.trim().getBytes(), 0, c, data.length, sentence.trim().getBytes().length);*/
 
          System.out.println("-----------------");
-         System.out.println(data.length);
+         System.out.println("port: " + port);
+         //System.out.println(data.length);
          System.out.println(sentence.trim().length());
-         System.out.println("Message size: " + (data.length + sentence.getBytes().length));
+         System.out.println("Message size: " + (/*data.length + */sentence.getBytes().length));
          System.out.println("-----------------");
 
-         sendData = c;
+         sentence = "Received: " + sentence;
+         sendData = sentence.trim().getBytes(); //c;
          DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
          
 
