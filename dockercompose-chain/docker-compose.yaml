@@ -1,0 +1,34 @@
+version: '3.1'
+
+# WARNING: this docker compose it's only for development purpose and thus it's
+# not suitable for production environments!
+
+services:
+
+  ingress:
+    image: augugrumi/ironhide:latest
+    restart: always
+    environment:
+      ROULETTE_SERVICE: ${ROULETTE_ADDR:-127.0.0.1:57684}
+    ports:
+      - 8701:8701
+    command: ["-o", "8701"]
+
+  astaire1:
+    image: augugrumi/astaire:latest
+    restart: always
+    command: ["-u", "-l", "8702", "-r", "${ROULETTE_ADDR:-127.0.0.1:57684}"]
+
+  astaire2:
+    image: augugrumi/astaire:latest
+    restart: always
+    command: ["-u", "-l", "8703", "-r", "${ROULETTE_ADDR:-127.0.0.1:57684}"]
+
+  egress:
+    image: augugrumi/ironhide:latest
+    restart: always
+    environment:
+      ROULETTE_SERVICE: ${ROULETTE_ADDR:-127.0.0.1:57684}
+    ports:
+      - 8777:8777
+    command: ["-i", "8704", "-o", "8777","-e"]
