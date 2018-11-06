@@ -35,6 +35,10 @@ def parse_args():
                       help='Receiver port, eg. 623',
                       type=int)
 
+    parser.add_option('--reverse',
+                      action='store_true',
+                      help='Reverse the header addition')
+
     return parser.parse_args()
 
 (options, args) = parse_args()
@@ -63,9 +67,14 @@ def handle_single_connection(clientsocket):
         logger.debug('received data')
         pkt = IP(src=my_ip, dst=options.recv_ip) / \
             TCP(sport=options.port, dport=options.recv_port)
-        data = raw(pkt) + data
+        if not options.reverse:
+            data = raw(pkt) + data
+
         sock_dst.send(data)
         data = sock_dst.recv(65535)
+        if options.reverse:
+            data = raw(pkt) + data
+
         clientsocket.send(data)
 
 def recv():
