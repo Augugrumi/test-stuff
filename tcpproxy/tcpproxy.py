@@ -66,17 +66,19 @@ def handle_single_connection(clientsocket):
 
     sock_dst.connect(dst_addr)
     while True:
-        data = clientsocket.recv(65535)
+        pkt = IP(src=my_ip, dst=options.recv_ip) / \
+            TCP(sport=options.port, dport=options.recv_port)
+        data = clientsocket.recv(65535 - len(pkt))
         if not data:
             logger.error('error while receiving data')
             sock_dst.shutdown(socket.SHUT_RDWR)
             sock_dst.close()
             break
         logger.debug('received data')
-        pkt = IP(src=my_ip, dst=options.recv_ip) / \
-            TCP(sport=options.port, dport=options.recv_port)
         if not options.reverse:
             data = raw(pkt) + data
+            logger.debug(data)
+
 
         sock_dst.send(data)
 
