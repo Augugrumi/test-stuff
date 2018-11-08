@@ -4,6 +4,7 @@
 from optparse import OptionParser
 import socket
 import logging
+import threading
 from scapy.all import *
 from binascii import hexlify
 
@@ -51,65 +52,41 @@ def get_my_ip():
     s.close()
     return res
 
+def send_thread(sock_dst, options, pkt, clientsocket):
+    data = sock_dst.recv(65535)
+    if options.reverse:
+        data = raw(pkt) + data
+
+    clientsocket.send(data)
+
 def handle_single_connection(clientsocket):
     sock_dst = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_dst.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     dst_addr = (options.dst_ip, options.dst_port)
     my_ip = get_my_ip()
 
     sock_dst.connect(dst_addr)
-    if options.reverse:
-        clientsocket.setblocking(False)
-    else:
-        sock_dst.setblocking(False) # gonna live on the edge
     while True:
-        logger.debug('iteration')
-        try:
-            data = clientsocket.recv(65535)
-            if not data:
-                logger.error('error while receiving data')
-                sock_dst.shutdown(socket.SHUT_RDWR)
-                sock_dst.close()
-                break
-            logger.debug('received data')
-            pkt = IP(src=my_ip, dst=options.recv_ip) / \
-                TCP(sport=options.port, dport=options.recv_port)
-            logger.debug('incoming data: ' + data.decode("utf-8"))
-            if not options.reverse:
-                data = raw(pkt) + data
+        data = clientsocket.recv(65535)
+        if not data:
+            logger.error('error while receiving data')
+            sock_dst.shutdown(socket.SHUT_RDWR)
+            sock_dst.close()
+            break
+        logger.debug('received data')
+        pkt = IP(src=my_ip, dst=options.recv_ip) / \
+            TCP(sport=options.port, dport=options.recv_port)
+        if not options.reverse:
+            data = raw(pkt) + data
 
-            try:
-                sock_dst.send(data)
-            except socket.timeout as e:
-                err = e.args[0]
-                if err == 'timed out':
-                    logger.warning('Receiver timed out')
-                    continue
-        except BlockingIOError as e:
-            err = e.args[0]
-            if err == 'timed out':
-                logger.debug('The clientsocket timed out')
+        sock_dst.send(data)
 
-        try:
-            data = sock_dst.recv(65535)
-            logger.debug('data to send: ' + data.decode("utf-8"))
-            if options.reverse:
-                data = raw(pkt) + data
-
-            clientsocket.send(data)
-        except BlockingIOError as e:
-            err = e.args[0]
-            if err == 'timed out':
-                logger.debug('Destination didn\'t reply in time')
-                continue
+        Thread(target=send_thread, args=[sock_dst, options, pkt, clientsocket]).start()
 
 def recv():
     sock_src = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     recv_addr = (options.bind_address, options.port)
 
     # Waiting for incoming TCP connection
-    sock_src.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock_src.bind(recv_addr)
     sock_src.listen(5)
     while True:
