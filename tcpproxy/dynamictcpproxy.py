@@ -53,18 +53,65 @@ def get_my_ip():
     s.close()
     return res
 
-def sender_queue_elaborator():
-    pass
+def queue_elaborator(sock, queue):
+    while True:
+        item = queue.get()
+        sock.send(item)
 
-def receiver_queue_elaborator():
-    pass
+def queue_adder(sock, queue, header = True):
+    while True:
+        data = sock.recv(65535)
+        if not data:
+            logger.error('error while receiving data')
+            sock.shutdown(socket.SHUT_RDWR)
+            sock.close()
+            break
+        logger.debug('incoming data: ' + data.decode("utf-8"))
+        if header:
+            pkt = IP(src=my_ip, dst=options.recv_ip) / \
+                TCP(sport=options.port, dport=options.recv_port)
+            data = raw(pkt) + data
+        queue.put(data)
 
 
 def recv():
-    pass
+    sock_src = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-sender_worker = Thread(target=sender_queue_elaborator, name='sender_worker')
-receiver_worker = Thread(target=receiver_queue_elaborator, name='receiver_worker')
+    recv_addr = (options.bind_address, options.port)
+
+    # Waiting for incoming TCP connection
+    sock_src.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock_src.bind(recv_addr)
+    sock_src.listen(5)
+    while True:
+        logger.debug('waiting for an incoming connection...')
+        (clientsocket, address) = sock_src.accept()
+        dst_queue = Queue()
+        src_queue = Queue()
+        logger.debug('incoming connection accepted')
+        sock_dst = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock_dst.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        dst_addr = (options.dst_ip, options.dst_port)
+        my_ip = get_my_ip()
+        sock_dst.connect(dst_addr)
+        to_src_worker = Thread(target=queue_elaborator, \
+                               args=[clientsocket, src_queue], name='to_src')
+        to_dst_worker = Thread(target=queue_elaborator, \
+                                 args=[sock_dst, dst_queue], name='to_dst')
+        src_listener = Thread(target=queue_adder, \
+                               args=[clientsocket, dst_queue, options.reverse], name='from_src')
+        dst_listener = Thread(target=queue_adder, \
+                              args=[sock_dst, src_queue, not options.reverse], name='from_dst')
+        to_src_worker.start()
+        to_dst_worker.start()
+        src_listener.start()
+        dst_listener.start()
+
+        src_listener.join()
+        dst_listener.join()
+        logger.debug('current connection closed')
+
+    sock_src.close()
 
 if __name__ == '__main__':
     parse_args()
