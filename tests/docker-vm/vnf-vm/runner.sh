@@ -12,7 +12,7 @@ function stop_vm(){
         msg info "Waiting for machine $1 to being powered off..."
         sleep 3
     done
-    msg info info "VM terminated"
+    msg info "VM terminated"
 }
 
 function check_vbox() {
