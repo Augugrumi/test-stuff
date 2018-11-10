@@ -9,6 +9,7 @@ function stop_vm(){
     VBoxManage controlvm $1 acpipowerbutton
     while [ "$(VBoxManage list runningvms)" != "" ]
     do
+        msg info "Waiting for machine $1 to being powered off..."
         sleep 3
     done
     msg info info "VM terminated"
