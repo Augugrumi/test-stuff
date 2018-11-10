@@ -20,33 +20,46 @@ function check_vbox() {
         msg info "Run $i - VM started"
         VBoxHeadless -s "$2" &
         msg info "Waiting for VM startup..."
-        /usr/bin/time -f"%e" -ao "$3" nc -l 16123
+        /usr/bin/time -f"%e" -ao "$3" nc -l $4
         stop_vm $2
     done
 }
 
 function check_docker() {
-    for i in $(seq 1 $2)
+    for i in $(seq 1 $1)
     do
         msg info "Run $i - Docker started"
-        docker run --rm -name astaire-test augugrumi/test-stuff:astaire
-        /usr/bin/time -f"%e" -ao "$3" nc -l 16123
+        local TMP_TIMING_REMOVE=$(mktemp)
+        /usr/bin/time -f"%e" -o "$TMP_TIMING_REMOVE" nc -l $4 &
+        docker run -d --name astaire-test $2
+        local START=$(docker inspect --format='{{.State.StartedAt}}' astaire-test)
+        local STOP=$(docker inspect --format='{{.State.FinishedAt}}' astaire-test)
+        local START_TIMESTAMP=$(($(date --date=$START +%s%N)/1000000))
+        local STOP_TIMESTAMP=$(($(date --date=$STOP +%s%N)/1000000))
+        local MS_DIFF=$(($STOP_TIMESTAMP-$START_TIMESTAMP))
+        local S_DIFF=$(bc -l <<< "$MS_DIFF/1000")
+        local FORMATTED_S_DIFF=$(echo $S_DIFF | awk '{printf "%f", $0}')
+        msg info "Registered time: $FORMATTED_S_DIFF"
+        echo $FORMATTED_S_DIFF >> $3
+        docker kill astaire-test 2>/dev/null
+        docker rm astaire-test >/dev/null
+        rm -f $TMP_TIMING_REMOVE
         msg info "Docker terminated"
     done
 }
 
 function main() {
-    msg info "-- VM vs Docker Tool Checker, v0.1"
-    msg info "Output log: $1"
+    msg info "-- VM vs Docker Tool Checker, v0.1 --"
+    msg info "Output log name: $1"
     msg info "Numer of iterations set: $2"
     msg info "VM name: $3"
     msg info "Docker name: $4"
     msg info "The server is listening in port: $5"
 
-    check_vbox $2 $3 "$1.vm"
-#    check_docker $2 $4 "$1.docker"
+    check_vbox $2 $3 "$1.vm" $5
+    check_docker $2 $4 "$1.docker" $5
 
-    msg info "Tests finished. Bye!"
+    msg info "Tests finished. Output file: $1. Number of tests performed: $2. Bye!"
 }
 
 main $@
