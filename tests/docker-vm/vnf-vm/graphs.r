@@ -10,6 +10,7 @@ print_pie = function(data, path, name) {
      png(filename=sprintf("%s/%sGraph.png", path, name))
      pie(
         c(sum(data[,1]), sum(data[,2])),
+        col=c("darkgreen", "darkred"),
         labels = c("Virtual Box", "Docker"),
         main = "Docker vs VM start up times")
      dev.off()
@@ -18,11 +19,11 @@ print_pie = function(data, path, name) {
 print_barplot = function(data, path, name) {
     png(filename=sprintf("%s/%sGraph.png", path, name))
     barplot(
-        c(sum(data[,1]), sum(data[,2])), # pass first and second data column
+        c(sum(data[,1]), sum(data[,2])),
         main="Docker vs Virtual Machine startup times",
         col=c("darkgreen", "darkred"),
         ylim=c(0, round((max(sum(data[,1]), sum(data[,2])) / 500))+1)*500,
-        names.arg=c("Virtual Box", "Docker"), # pass first and second data name
+        names.arg=c("Virtual Box", "Docker"),
         cex.lab=2,
         cex.axis=2,
         cex.names=2,
