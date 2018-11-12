@@ -61,6 +61,7 @@ function main() {
     check_docker $2 $4 "$1.docker" $5
 
     msg info "Tests finished. Output file: $1. Number of tests performed: $2. Bye!"
+    ./zip.py "$1"
 }
 
 main $@
