@@ -97,7 +97,7 @@ def handle_single_connection(clientsocket):
                 data = raw(pkt) + data
             sock_dst.send(data[:2048])
             data = data[2048:]
-            time.sleep(0.05)
+            time.sleep(0.01)
         #if not options.reverse:
         #    data = raw(pkt) + data
         #if (len(data) > 45000):
