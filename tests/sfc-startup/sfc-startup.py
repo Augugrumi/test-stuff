@@ -70,8 +70,8 @@ def launch_test():
 
 def main():
     logger.info('--SFC launch timer, v0.1--')
-    logger.info('Number of lauches set to: ' + options.launch)
-    logger.info('Elements in the chain: ' + options.chain_length)
+    logger.info('Number of lauches set to: ' + str(options.launch))
+    logger.info('Elements in the chain: ' + str(options.chain_length))
     logger.info('YAML to launch: ' + options.yaml)
 
     results = list()
