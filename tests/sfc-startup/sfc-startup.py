@@ -56,14 +56,12 @@ def launch_test():
     while flag:
         data, addr = sock.recvfrom(1024)
         logger.info('Received ack from ' + str(addr))
-        if data == 'ready':
-            ack_counter += 1
-        else:
-            logger.debug('Data arrived but it wasn\'t an ACK')
+        ack_counter += 1
         if ack_counter == options.launch:
             flag = False
             time_stop = time.time()
     subprocess.check_call([K8S_BIN, DELETE_COMMAND, FILE_FLAG, options.yaml])
+    sock.close()
     if time_stop > 0:
         return time_stop - time_launch
     else:
