@@ -10,7 +10,7 @@ then
     rm $tmpfile
 fi
 
-astaire $@ &
 echo -n "ready" > /dev/udp/$ACK_URL/$ACK_PORT
+astaire $@
 
 exit 0
