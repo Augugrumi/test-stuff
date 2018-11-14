@@ -84,7 +84,7 @@ def main():
         result_writer = csv.writer(result_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         result_writer.writerow(['Time', 'Elements'])
-        result_writer.writerows(map(lambda r: (r, options.launch), results))
+        result_writer.writerows(map(lambda r: (r, options.chain_length), results))
 
 
 if __name__ == '__main__':
