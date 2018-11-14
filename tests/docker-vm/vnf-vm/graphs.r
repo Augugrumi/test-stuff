@@ -2,7 +2,8 @@
 
 print_boxplot = function(data, path, name) {
     png(filename=sprintf("%s/%sGraph.png", path, name))
-    boxplot(range01(data[,1]), range01(data[,2]))
+    names = structure(list(range01(data[,1]), range01(data[,2])), .Names = c("Virtual Box", "Docker"), class = "data.frame")
+    boxplot(names)
     dev.off()
 }
 
