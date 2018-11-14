@@ -57,7 +57,7 @@ def launch_test():
         data, addr = sock.recvfrom(1024)
         logger.info('Received ack from ' + str(addr))
         ack_counter += 1
-        if ack_counter == int(options.launch):
+        if ack_counter == options.chain_length:
             flag = False
             time_stop = time.time()
     subprocess.check_call([K8S_BIN, DELETE_COMMAND, FILE_FLAG, options.yaml])
