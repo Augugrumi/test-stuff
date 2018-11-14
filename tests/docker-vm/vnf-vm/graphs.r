@@ -21,7 +21,7 @@ print_barplot = function(data, path, name) {
     png(filename=sprintf("%s/%sGraph.png", path, name))
     barplot(
         c(sum(data[,1]), sum(data[,2])),
-        main="Docker vs Virtual Machine startup times",
+#         main="Docker vs Virtual Machine startup times",
         col=c("darkgreen", "darkred"),
         ylim=c(0, round((max(sum(data[,1]), sum(data[,2])) / 500))+1)*500,
         names.arg=c("Virtual Box", "Docker"),
