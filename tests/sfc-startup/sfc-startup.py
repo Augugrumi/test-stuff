@@ -52,7 +52,7 @@ def launch_test():
     ack_counter = 0
     flag = True
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind((0.0.0.0, options.listen_port))
+    sock.bind(("0.0.0.0", options.listen_port))
     while flag:
         data, addr = sock.recvfrom(1024)
         logger.info('Received ack from ' + str(addr))
