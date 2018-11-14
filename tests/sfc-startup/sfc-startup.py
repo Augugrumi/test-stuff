@@ -52,7 +52,7 @@ def launch_test():
     ack_counter = 0
     flag = True
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(("0.0.0.0", options.listen_port))
+    sock.bind(('', options.listen_port))
     while flag:
         data, addr = sock.recvfrom(1024)
         logger.info('Received ack from ' + str(addr))
@@ -78,7 +78,9 @@ def main():
 
     results = list()
     for i in range(options.launch):
+        logger.info('Executing test: ' + str(i))
         results.append(launch_test())
+        logger.info('Test ' + str(i) + ' terminated')
 
     with open('result.csv', mode='w') as result_file:
         result_writer = csv.writer(result_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
