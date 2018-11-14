@@ -22,9 +22,9 @@ spec:
           image: augugrumi/test-stuff:sfc-startup
           env:
             - name: ACK_PORT
-              value: 16123
+              value: "16123"
             - name: ACK_URL
-              value: 192.168.30.18
+              value: "192.168.30.18"
           args: ["-u", "-r", "roulette-service:80"]
           imagePullPolicy: Always
           ports:
@@ -69,9 +69,9 @@ spec:
           image: augugrumi/test-stuff:sfc-startup
           env:
             - name: ACK_PORT
-              value: 16123
+              value: "16123"
             - name: ACK_URL
-              value: 192.168.30.18
+              value: "192.168.30.18"
           args: ["-u", "-r", "roulette-service:80"]
           imagePullPolicy: Always
           ports:
@@ -116,9 +116,9 @@ spec:
           image: augugrumi/test-stuff:sfc-startup
           env:
             - name: ACK_PORT
-              value: 16123
+              value: "16123"
             - name: ACK_URL
-              value: 192.168.30.18
+              value: "192.168.30.18"
           args: ["-u", "-r", "roulette-service:80"]
           imagePullPolicy: Always
           ports:
@@ -163,9 +163,9 @@ spec:
           image: augugrumi/test-stuff:sfc-startup
           env:
             - name: ACK_PORT
-              value: 16123
+              value: "16123"
             - name: ACK_URL
-              value: 192.168.30.18
+              value: "192.168.30.18"
           args: ["-u", "-r", "roulette-service:80"]
           imagePullPolicy: Always
           ports:
@@ -210,9 +210,9 @@ spec:
           image: augugrumi/test-stuff:sfc-startup
           env:
             - name: ACK_PORT
-              value: 16123
+              value: "16123"
             - name: ACK_URL
-              value: 192.168.30.18
+              value: "192.168.30.18"
           args: ["-u", "-r", "roulette-service:80"]
           imagePullPolicy: Always
           ports:
