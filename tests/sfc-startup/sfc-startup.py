@@ -57,7 +57,7 @@ def launch_test():
         data, addr = sock.recvfrom(1024)
         logger.info('Received ack from ' + str(addr))
         ack_counter += 1
-        if ack_counter == options.launch:
+        if ack_counter == int(options.launch):
             flag = False
             time_stop = time.time()
     subprocess.check_call([K8S_BIN, DELETE_COMMAND, FILE_FLAG, options.yaml])
@@ -70,21 +70,21 @@ def launch_test():
 
 def main():
     logger.info('--SFC launch timer, v0.1--')
-    logger.info('Number of lauches set to: ' + str(options.launch))
-    logger.info('Elements in the chain: ' + str(options.chain_length))
+    logger.info('Number of lauches set to: ' + options.launch)
+    logger.info('Elements in the chain: ' + options.chain_length)
     logger.info('YAML to launch: ' + options.yaml)
 
     results = list()
     for i in range(options.launch):
-        logger.info('Executing test: ' + str(i))
+        logger.info('Executing test: ' + str(i + 1))
         results.append(launch_test())
-        logger.info('Test ' + str(i) + ' terminated')
+        logger.info('Test ' + str(i + 1) + ' terminated')
 
     with open('result.csv', mode='w') as result_file:
         result_writer = csv.writer(result_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         result_writer.writerow(['Time', 'Elements'])
-    result_writer.writerows(map(lambda r: (r, options.launch), results))
+        result_writer.writerows(map(lambda r: (r, options.launch), results))
 
 
 if __name__ == '__main__':
