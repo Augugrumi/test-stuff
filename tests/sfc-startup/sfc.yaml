@@ -2,7 +2,7 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: astaire-deployment
+  name: test-deployment5
   namespace: default
   labels:
     k8s-app: astaire-vnf5
@@ -49,7 +49,7 @@ spec:
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: astaire-deployment
+  name: test-deployment4
   namespace: default
   labels:
     k8s-app: astaire-vnf4
@@ -96,7 +96,7 @@ spec:
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: astaire-deployment
+  name: test-deployment3
   namespace: default
   labels:
     k8s-app: astaire-vnf3
@@ -143,7 +143,7 @@ spec:
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: astaire-deployment
+  name: test-deployment2
   namespace: default
   labels:
     k8s-app: astaire-vnf2
@@ -190,7 +190,7 @@ spec:
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: astaire-deployment
+  name: test-deployment1
   namespace: default
   labels:
     k8s-app: astaire-vnf1
