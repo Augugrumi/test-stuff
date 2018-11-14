@@ -25,6 +25,7 @@ DELETE_COMMAND='delete'
 FILE_FLAG='-f'
 
 
+
 def parse_args():
     parser = OptionParser()
 
@@ -55,12 +56,19 @@ def launch_test():
     while flag:
         data, addr = sock.recvfrom(1024)
         logger.info('Received ack from ' + str(addr))
-        ack_counter += 1
+        if data == 'ready':
+            ack_counter += 1
+        else:
+            logger.debug('Data arrived but it wasn\'t an ACK')
         if ack_counter == options.launch:
             flag = False
             time_stop = time.time()
     subprocess.check_call([K8S_BIN, DELETE_COMMAND, FILE_FLAG, options.yaml])
-    return time_stop - time_launch
+    if time_stop > 0:
+        return time_stop - time_launch
+    else:
+        logger.warning('A test failed')
+        return -1
 
 def main():
     logger.info('--SFC launch timer, v0.1--')
