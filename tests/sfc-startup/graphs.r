@@ -4,7 +4,7 @@ print_boxplot = function(data, path, name) {
     png(filename=sprintf("%s/%sGraph.png", path, name))
     time = list()
     for (i in 1:10) {
-        time[[i]] = range01(sum(data[data$Elements == i, 1]))
+        time[[i]] = range01(data[data$Elements == i, 1])
     }
 #     names = structure(list(range01(data[,1]), range01(data[,2])), .Names = c("Virtual Box", "Docker"), class = "data.frame")
     boxplot(time)
@@ -31,12 +31,13 @@ print_barplot = function(data, path, name) {
         unlist(time),
         main="SFC start up times",
         col=c("darkgreen", "darkred", "darkmagenta", "darkorange", "darkslateblue", "darkslategray", "gold", "dimgray", "darksalmon", "deepskyblue"),
-        ylim=c(0, round((max(unlist(time)) / 500)) + 1) * 500)
-#         names.arg=c("Virtual Box", "Docker"),
+        ylim=c(0, round((max(unlist(time)) / 500)) + 1) * 500,
+        names.arg=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
 #         cex.lab=2,
 #         cex.axis=2,
 #         cex.names=2,
 #         cex.main=2)
+    mtext(side=1, line=3, text="SFC length")
     dev.off()
 }
 
