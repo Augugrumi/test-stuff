@@ -45,10 +45,10 @@ if __name__ == '__main__':
             UDP(sport=options.src_port, dport=options.dst_port)
         data = raw(pkt) + "xxxxxxxx".encode("utf-8")
         sock_dst.sendto(data, dst_addr)
-        bsent = int(time.time())
+        bsent = time.time()
         sock_dst.recvfrom(65535)
-        asent = int(time.time())
-        received = int(time.time())
+        asent = time.time()
+        received = time.time()
 
         res.append([bsent, asent, received])
         sock_dst.close()
