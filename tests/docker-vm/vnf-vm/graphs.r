@@ -20,15 +20,16 @@ print_pie = function(data, path, name) {
 print_barplot = function(data, path, name) {
     png(filename=sprintf("%s/%sGraph.png", path, name))
     barplot(
-        c(sum(data[,1]), sum(data[,2])),
+        c(log(sum(data[,1])), log(sum(data[,2]))),
 #         main="Docker vs Virtual Machine startup times",
         col=c("darkgreen", "darkred"),
-        ylim=c(0, round((max(sum(data[,1]), sum(data[,2])) / 500))+1)*500,
+        ylim=c(0, round(log((max(sum(data[,1]), sum(data[,2])))) / 5))*5,
         names.arg=c("Virtual Box", "Docker"),
         cex.lab=2,
         cex.axis=2,
         cex.names=2,
         cex.main=2)
+    mtext(side=2, line=3, text="log(seconds)")
     dev.off()
 }
 
