@@ -38,6 +38,7 @@ print_barplot = function(data, path, name) {
 #         cex.names=2,
 #         cex.main=2)
     mtext(side=1, line=3, text="SFC length")
+    mtext(side=2, line=3, text="seconds")
     dev.off()
 }
 
